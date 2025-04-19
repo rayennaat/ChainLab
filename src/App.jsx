@@ -10,15 +10,15 @@ import Connect from './pages/connect';
 
 
 const routes= (
-  <Router>
-    <Routes>
-      <Route path='/' exact element={<Home />} />
-      <Route path='/blockChain' exact element={<Blockchain />} />
-      <Route path='/web3' exact element={<Web3 />} />      
-      <Route path='/demo' exact element={<Demo />} /> 
-      <Route path="/connect" element={<Connect />} />
-    </Routes>
-  </Router>
+  <Router basename="/ChainLab">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/blockChain" element={<Blockchain />} />
+        <Route path="/web3" element={<Web3 />} />
+        <Route path="/demo" element={<Demo />} />
+        <Route path="/connect" element={<Connect />} />
+      </Routes>
+    </Router>
 );
 
 const App = () => {

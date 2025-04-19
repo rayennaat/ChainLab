@@ -1,16 +1,27 @@
 import { motion } from 'framer-motion';
 import { FaEthereum, FaWallet, FaArrowLeft, FaCheck } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
 import Navbar from '../Components/navbar';
 
 const Connect = () => {
   const [connectedWallet, setConnectedWallet] = useState(null);
+  const [countdown, setCountdown] = useState(15); // Added countdown state
 
   const handleConnect = (walletName) => {
     setConnectedWallet(walletName);
-    // Auto-disconnect after 15 seconds (like real sessions)
-    setTimeout(() => setConnectedWallet(null), 15000);
+    setCountdown(15); // Reset countdown when connecting
+    // Auto-disconnect after 15 seconds
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setConnectedWallet(null);
+          return 15;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const wallets = [
@@ -19,40 +30,37 @@ const Connect = () => {
       name: 'MetaMask',
       description: 'Browser extension',
       icon: <FaEthereum className="text-2xl text-orange-400" />,
-      color: 'orange'
     },
     {
       id: 'walletconnect',
       name: 'WalletConnect',
       description: 'Mobile wallet connection',
       icon: <div className="w-6 h-6 bg-purple-500 rounded-full" />,
-      color: 'purple'
     },
     {
       id: 'coinbase',
       name: 'Coinbase Wallet',
       description: 'Coinbase ecosystem',
       icon: <div className="w-6 h-6 bg-blue-400 rounded-full" />,
-      color: 'blue'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen text-white bg-black">
       <Navbar/>
-      <div className="max-w-md mx-auto p-4 py-24">
+      <div className="max-w-md p-4 py-24 mx-auto">
         {/* Header */}
-        <header className="flex items-center gap-4 mb-8 pt-8">
+        <header className="flex items-center gap-4 pt-8 mb-8">
           <Link to="/" className="text-gray-400 hover:text-white">
             <FaArrowLeft size={20} />
           </Link>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-2xl font-bold">
             <FaWallet /> Connect Wallet
           </h1>
         </header>
 
         {/* Wallet Options */}
-        <div className="space-y-4 mb-8">
+        <div className="mb-8 space-y-4">
           {wallets.map((wallet) => (
             <motion.button
               key={wallet.id}
@@ -61,12 +69,12 @@ const Connect = () => {
               onClick={() => handleConnect(wallet.id)}
               className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all ${
                 connectedWallet === wallet.id
-                ? 'bg-green-900/20 border-green-500'
-                : 'bg-gray-800 hover:bg-gray-700 border-gray-700'
+                  ? 'bg-green-900/20 border-green-500'
+                  : 'bg-gray-800 hover:bg-gray-700 border-gray-700'
               }`}
             >
               {wallet.icon}
-              <div className="text-left flex-1">
+              <div className="flex-1 text-left">
                 <p className="font-medium">{wallet.name}</p>
                 <p className="text-sm text-gray-400">{wallet.description}</p>
               </div>
@@ -74,7 +82,7 @@ const Connect = () => {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="text-green-400 flex items-center gap-1"
+                  className="flex items-center gap-1 text-green-400"
                 >
                   <FaCheck />
                   <span className="text-sm">Connected</span>
@@ -89,17 +97,18 @@ const Connect = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-3 bg-gray-800 rounded-lg border border-green-500/30 flex items-center"
+            className="flex items-center p-3 mb-6 bg-gray-800 border rounded-lg border-green-500/30"
           >
-            <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+            <div className="w-2 h-2 mr-2 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-sm">
-              Connected to {wallets.find(w => w.id === connectedWallet).name} (auto-disconnect in 15s)
+              Connected to {wallets.find(w => w.id === connectedWallet).name} 
+              (disconnecting in {countdown}s)
             </span>
           </motion.div>
         )}
 
         {/* Footer */}
-        <div className="text-center text-xs text-gray-500 border-t border-gray-800 pt-4">
+        <div className="pt-4 text-xs text-center text-gray-500 border-t border-gray-800">
           <p>By connecting, you agree to our Terms and Privacy Policy</p>
           <p className="mt-2">This is a frontend demo only</p>
         </div>
